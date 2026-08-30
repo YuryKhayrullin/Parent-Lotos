@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class ChildrenController extends Controller
 {
-    protected $clientService;
+    protected ClientService $clientService;
 
     public function __construct(ClientService $clientService)
     {

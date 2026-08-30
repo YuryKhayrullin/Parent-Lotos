@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class WebhookController extends Controller
 {
-    protected $clientService;
+    protected ClientService $clientService;
 
     public function __construct(ClientService $clientService)
     {

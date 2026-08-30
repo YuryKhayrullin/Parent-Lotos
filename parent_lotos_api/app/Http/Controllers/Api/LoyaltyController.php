@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class LoyaltyController extends Controller
 {
-    protected $yclients;
+    protected YclientsClient $yclients;
 
     public function __construct(YclientsClient $yclients)
     {

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class CabinetController extends Controller
 {
-    protected $clientService;
+    protected ClientService $clientService;
 
     public function __construct(ClientService $clientService)
     {
@@ -21,6 +21,10 @@ class CabinetController extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
         
         // If user is a ParentProfile model (from our auth system)
         if ($user instanceof \App\Models\ParentProfile) {

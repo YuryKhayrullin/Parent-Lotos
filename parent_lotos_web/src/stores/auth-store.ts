@@ -55,8 +55,7 @@ export const AuthStore = types
         const response = yield fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ phone: self.phone, code: self.code }),
+          body: JSON.stringify({ phone: self.phone, otp: self.code.replace(/\D/g, '') }),
         })
         const data = yield response.json()
         if (!response.ok) {
@@ -64,7 +63,7 @@ export const AuthStore = types
           return
         }
         self.authenticated = true
-        self.parentId = data.parentId
+        self.parentId = data.user?.id
       } catch {
         self.error = 'Ошибка сети. Попробуйте позже.'
       } finally {

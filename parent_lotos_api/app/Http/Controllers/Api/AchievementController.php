@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class AchievementController extends Controller
 {
-    public function index(Request $request, $childId)
+    public function index(Request $request, string $childId)
     {
         $user = $request->user();
         

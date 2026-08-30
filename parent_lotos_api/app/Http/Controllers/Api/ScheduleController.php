@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class ScheduleController extends Controller
 {
-    protected $yclients;
+    protected YclientsClient $yclients;
 
     public function __construct(YclientsClient $yclients)
     {
@@ -46,7 +46,7 @@ class ScheduleController extends Controller
         return response()->json([]);
     }
 
-    public function forChild(Request $request, $childId)
+    public function forChild(Request $request, string $childId)
     {
         $user = $request->user();
         

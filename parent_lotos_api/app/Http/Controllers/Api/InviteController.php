@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class InviteController extends Controller
 {
-    public function resolve(Request $request, $token)
+    public function resolve(Request $request, string $token)
     {
         // Find the invite token
         $inviteToken = InviteToken::where('token', $token)

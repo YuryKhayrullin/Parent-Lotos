@@ -77,12 +77,12 @@ export const AuthScreen = observer(function AuthScreen() {
               value={auth.code}
               onChange={(e) => auth.setCode(e.target.value)}
               inputMode="numeric"
-              placeholder="••••••"
+              placeholder="••••"
               className="mt-7 min-h-16 w-full rounded-2xl border border-[#dfe6ed] text-center text-2xl tracking-[.4em] outline-none focus:border-[#be43be]"
             />
             {auth.error && <p className="mt-3 text-sm font-semibold text-red-600">{auth.error}</p>}
             <button
-              disabled={auth.code.length < 6 || auth.loading}
+              disabled={(auth.code.replace(/\D/g, '').length < 4 || auth.code.replace(/\D/g, '').length > 6) || auth.loading}
               onClick={handleNext}
               className="mt-5 min-h-14 w-full rounded-2xl bg-[#be43be] text-sm font-black text-white disabled:opacity-40"
             >

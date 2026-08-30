@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Http;
 use App\Services\Yclients\YclientsClient;
 use App\Services\Yclients\ClientService;
+use App\Services\Sms\SmsServiceInterface;
+use App\Services\Sms\LogSmsDriver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,6 +16,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(SmsServiceInterface::class, LogSmsDriver::class);
+
         $this->app->singleton(YclientsClient::class, function ($app) {
             return new YclientsClient(
                 Http::baseUrl(config('yclients.base_url')),
