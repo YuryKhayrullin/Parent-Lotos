@@ -132,12 +132,82 @@ class AuthController extends Controller
         return $digits;
     }
 
-    public function logout(Request $request)
+    public function magicLogin(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-        
+        $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $inviteToken = \App\Models\InviteToken::where('token', $request->token)
+            ->where('used_at', null)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$inviteToken) {
+            throw ValidationException::withMessages(['token' => 'Invalid or expired token']);
+        }
+
+        $inviteToken->update(['used_at' => now()]);
+        $parent = $inviteToken->parent;
+
+        $sanctumToken = $parent->createToken('parent_lotos_magic_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Logged out successfully'
+            'user' => $parent,
+            'token' => $sanctumToken,
         ]);
     }
+
+    public function unlock(Request $request)
+    {
+        $request->validate([
+            'pin' => 'required|string|regex:/^\d{4}$/',
+        ]);
+
+        if (!Hash::check($request->pin, $request->user()->pin_code)) {
+            return response()->json(['message' => 'Неверный PIN-код'], 422);
+        }
+
+        return response()->json(['success' => true], 200);
+    }
+
+    public function setPin(Request $request)
+    {
+        $request->validate([
+            'pin' => 'required|string|regex:/^\d{4}$/',
+        ]);
+
+        $request->user()->update([
+            'pin_code' => Hash::make($request->pin),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'PIN set successfully',
+            'user' => $request->user()
+        ], 200);
+    }
+
+    public function pinLogin(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|regex:/^[\d\s\+\-\(\)]{10,20}$/',
+            'pin' => 'required|string|regex:/^\d{4}$/',
+        ]);
+
+        $phone = $this->normalizePhone($request->phone);
+        $parent = \App\Models\ParentProfile::where('phone', $phone)->first();
+
+        if (!$parent || !$parent->pin_code || !Hash::check($request->pin, $parent->pin_code)) {
+            throw ValidationException::withMessages(['pin' => 'Invalid phone or PIN']);
+        }
+
+        $sanctumToken = $parent->createToken('parent_lotos_pin_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $parent,
+            'token' => $sanctumToken,
+        ]);
+    }
+
 }

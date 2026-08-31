@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { AuthScreen } from '@/components/lotos/auth-screen'
+import { SetPinModal } from '@/components/lotos/set-pin-modal'
+import { LockScreen } from '@/components/lotos/lock-screen'
 import { DashboardShell } from '@/components/lotos/dashboard-shell'
 import { HomeView, ScheduleView, AchievementsView, AbsenceView } from '@/components/lotos/dashboard-views'
 import { PanelOverlay } from '@/components/lotos/panel-overlay'
@@ -11,11 +13,30 @@ export const App = observer(function App() {
   const { auth, app } = useStore()
 
   useEffect(() => {
-    auth.checkSession()
+    const urlParams = new URLSearchParams(window.location.search)
+    const token = urlParams.get('token')
+    if (token) {
+      auth.magicLogin(token)
+      window.history.replaceState({}, '', window.location.pathname)
+    } else {
+      auth.checkSession()
+    }
   }, [auth])
+
+  if (auth.loading) {
+    return <main className="flex min-h-screen items-center justify-center">Loading...</main>
+  }
 
   if (!auth.authenticated) {
     return <AuthScreen />
+  }
+
+  if (!auth.user?.has_pin) {
+    return <SetPinModal />
+  }
+  
+  if (!auth.isUnlocked) {
+    return <LockScreen />
   }
 
   return (

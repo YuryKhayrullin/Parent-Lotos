@@ -15,6 +15,10 @@ use App\Http\Controllers\Api\InviteController;
 Route::prefix('auth')->group(function () {
     Route::post('request-otp', [AuthController::class, 'requestOtp']);
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('magic-login', [AuthController::class, 'magicLogin']);
+    Route::post('pin-login', [AuthController::class, 'pinLogin']);
+    Route::post('unlock', [AuthController::class, 'unlock'])->middleware('auth:sanctum');
+    Route::post('set-pin', [AuthController::class, 'setPin'])->middleware('auth:sanctum');
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
 

@@ -8,8 +8,10 @@ export const AuthScreen = observer(function AuthScreen() {
   const handleNext = () => {
     if (auth.step === 'phone') {
       auth.requestOtp()
-    } else {
+    } else if (auth.step === 'code') {
       auth.verifyOtp()
+    } else {
+      auth.pinLogin()
     }
   }
 
@@ -32,6 +34,8 @@ export const AuthScreen = observer(function AuthScreen() {
             <h1 className="mt-2 text-3xl font-black tracking-[-.06em]">Войдите в кабинет</h1>
             <p className="mt-3 text-sm leading-6 text-[#718097]">
               Введите номер телефона, который указан в договоре клуба.
+              <br />
+              <span className="font-bold text-[#be43be]">Первый вход осуществляется по ссылке из SMS.</span>
             </p>
             <label className="mt-7 block text-xs font-bold">
               Номер телефона
@@ -46,13 +50,19 @@ export const AuthScreen = observer(function AuthScreen() {
             {auth.error && <p className="mt-3 text-sm font-semibold text-red-600">{auth.error}</p>}
             <button
               disabled={auth.phone.length < 5 || auth.loading}
-              onClick={handleNext}
+              onClick={() => auth.requestOtp()}
               className="mt-5 min-h-14 w-full rounded-2xl bg-[#be43be] text-sm font-black text-white disabled:opacity-40"
             >
               {auth.loading ? 'Отправка…' : 'Получить код'}
             </button>
+            <button
+              onClick={() => auth.setAuthStep('pin')}
+              className="mt-4 w-full text-sm font-bold text-[#718097]"
+            >
+              У меня уже есть PIN-код
+            </button>
           </>
-        ) : (
+        ) : auth.step === 'code' ? (
           <>
             <button
               onClick={() => auth.backToPhone()}
@@ -87,6 +97,36 @@ export const AuthScreen = observer(function AuthScreen() {
               className="mt-5 min-h-14 w-full rounded-2xl bg-[#be43be] text-sm font-black text-white disabled:opacity-40"
             >
               {auth.loading ? 'Проверка…' : 'Открыть кабинет'}
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => auth.backToPhone()}
+              className="flex items-center gap-2 text-xs font-bold text-[#718097]"
+            >
+              <ArrowLeft size={15} />
+              Назад
+            </button>
+            <h1 className="mt-6 text-3xl font-black tracking-[-.06em]">Вход по PIN-коду</h1>
+            <label className="mt-7 block text-xs font-bold">
+              PIN-код
+              <input
+                autoFocus
+                value={auth.pin}
+                onChange={(e) => auth.setPin(e.target.value)}
+                inputMode="numeric"
+                placeholder="••••"
+                className="mt-2 min-h-16 w-full rounded-2xl border border-[#dfe6ed] text-center text-2xl tracking-[.4em] outline-none focus:border-[#be43be]"
+              />
+            </label>
+            {auth.error && <p className="mt-3 text-sm font-semibold text-red-600">{auth.error}</p>}
+            <button
+              disabled={auth.pin.length < 4 || auth.loading}
+              onClick={handleNext}
+              className="mt-5 min-h-14 w-full rounded-2xl bg-[#be43be] text-sm font-black text-white disabled:opacity-40"
+            >
+              {auth.loading ? 'Вход...' : 'Войти'}
             </button>
           </>
         )}

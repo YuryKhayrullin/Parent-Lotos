@@ -17,7 +17,21 @@ class ParentProfile extends Model
         'name',
         'email',
         'synced_at',
+        'pin_code',
     ];
+
+    protected $hidden = [
+        'pin_code',
+    ];
+
+    protected $appends = [
+        'has_pin',
+    ];
+
+    public function getHasPinAttribute(): bool
+    {
+        return !is_null($this->pin_code);
+    }
 
     public function children(): HasMany
     {
